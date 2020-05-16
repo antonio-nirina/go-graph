@@ -3,10 +3,12 @@ package queries
 import (
 	"log"
 
-	"github.com/antonio-nirina/graph/types"
+	"github.com/antonio-nirina/go-graph/model"
+	"github.com/antonio-nirina/go-graph/types"
 	"github.com/graphql-go/graphql"
 )
 
+var user = model.User{}
 // GetUserQuery returns the queries available against user type.
 func GetUserQuery() *graphql.Field {
 	return &graphql.Field{
@@ -20,7 +22,7 @@ func GetUserQuery() *graphql.Field {
 	}
 }
 
-func fetchPostByiD(id int) (*User, error) {
+func fetchPost() (string, error) {
 	resp, err := http.Get("https://coursev1.herokuapp.com/api/users")
 	if err != nil {
 		return nil, err
@@ -33,10 +35,6 @@ func fetchPostByiD(id int) (*User, error) {
 	if err != nil {
 		return nil, errors.New("could not read data")
 	}
-	result := Post{}
-	err = json.Unmarshal(b, &result)
-	if err != nil {
-		return nil, errors.New("could not unmarshal data")
-	}
-	return &result, nil
+	fmt.Println(string(b.data))
+	return "eee", nil
 }

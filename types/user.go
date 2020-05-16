@@ -21,8 +21,8 @@ var UserType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
 	Fields: graphql.Fields{
 		"_id":       &graphql.Field{Type: graphql.String},
-		"firstname": &graphql.Field{Type: graphql.String},
-		"lastname":  &graphql.Field{Type: graphql.String},
+		"firstName": &graphql.Field{Type: graphql.String},
+		"lastName":  &graphql.Field{Type: graphql.String},
 		"email":     &graphql.Field{Type: graphql.String},
 		"phone":     &graphql.Field{Type: graphql.String},
 		/*"roles": &graphql.Field{

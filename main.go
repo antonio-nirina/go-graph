@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/antonio-nirina/graph/queries"
-	// "github.com/antonio-nirina/graph/mutations"
+	"github.com/antonio-nirina/go-graph/queries"
+	// "github.com/antonio-nirina/go-graph/mutations"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
 )
@@ -36,6 +36,5 @@ func main() {
 
 	http.Handle("/", security.Handle(httpHandler))
 	fmt.Println("ready: listening 4000")
-
 	http.ListenAndServe(":4000", nil)
 }

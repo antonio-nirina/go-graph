@@ -1,28 +1,58 @@
 package queries
 
 import (
+	"fmt"
+	"io/ioutil"
+	"errors"
 	"log"
+	"net/http"
+	"encoding/json"
 
 	"github.com/antonio-nirina/go-graph/model"
 	"github.com/antonio-nirina/go-graph/types"
 	"github.com/graphql-go/graphql"
 )
 
+type Response struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data []User `json:"data"`
+}
+
+type User struct {
+	Addresse  string `json:"addresse"`
+	Avatar    string `json:"avatar"`
+	ID        string `json:"_id"`
+	Phone     string `json:"phone"`
+	Email     string `json:"email"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	
+}
+
 var user = model.User{}
+var resp = User{}
 // GetUserQuery returns the queries available against user type.
 func GetUserQuery() *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewList(types.UserType),
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			log.Printf("[query] user\n")
-			var users []types.User
-
-			return users, nil
+			log.Printf("")
+			// var users []types.User
+			resp.Addresse = ""
+			resp.Avatar = ""
+			resp.ID = "5eae6ac9d5aff51fbb501c4a"
+			resp.Phone = "098734577"
+			resp.Email = "zandry@gmail.com"
+			resp.FirstName = "Jhon"
+			resp.LastName = "Doe"
+			
+			return resp, nil
 		},
 	}
 }
 
-func fetchPost() (string, error) {
+func fetchPost() (*User, error) {
 	resp, err := http.Get("https://coursev1.herokuapp.com/api/users")
 	if err != nil {
 		return nil, err
@@ -35,6 +65,12 @@ func fetchPost() (string, error) {
 	if err != nil {
 		return nil, errors.New("could not read data")
 	}
-	fmt.Println(string(b.data))
-	return "eee", nil
+	
+	result := User{}
+	err = json.Unmarshal(b, &result)
+	if err != nil {
+		return nil, errors.New("could not unmarshal data")
+	}
+	fmt.Println(result)
+	return &result, nil
 }

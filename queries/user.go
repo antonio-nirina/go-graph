@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"encoding/json"
 
-	"github.com/antonio-nirina/go-graph/model"
+	// "github.com/antonio-nirina/go-graph/model"
 	"github.com/antonio-nirina/go-graph/types"
 	"github.com/graphql-go/graphql"
 )
@@ -30,8 +30,9 @@ type User struct {
 	
 }
 
-var user = model.User{}
+// var user = model.User{}
 var resp = User{}
+var result = []User{}
 // GetUserQuery returns the queries available against user type.
 func GetUserQuery() *graphql.Field {
 	return &graphql.Field{
@@ -46,9 +47,35 @@ func GetUserQuery() *graphql.Field {
 			resp.Email = "zandry@gmail.com"
 			resp.FirstName = "Jhon"
 			resp.LastName = "Doe"
-			
-			return resp, nil
+			result = append(result,resp)
+			return result, nil
 		},
+	}
+}
+
+func GetOneUserQuery() *graphql.Field {
+	return &graphql.Field{
+		Type:        types.UserType,
+		Description: "Get single user",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+
+			idQuery, isOK := params.Args["id"].(string)
+			if isOK {
+				// Search for el with id
+				for _, todo := range TodoList {
+					if todo.ID == idQuery {
+						return todo, nil
+					}
+				}
+			}
+
+			return Todo{}, nil
+		}
 	}
 }
 

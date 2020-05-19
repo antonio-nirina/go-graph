@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"encoding/json"
+	//"reflect"
 
 	// "github.com/antonio-nirina/go-graph/model"
 	"github.com/antonio-nirina/go-graph/types"
@@ -19,6 +20,12 @@ type Response struct {
 	Data []User `json:"data"`
 }
 
+type ResponseSi struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data User `json:"data"`
+}
+
 type User struct {
 	Addresse  string `json:"addresse"`
 	Avatar    string `json:"avatar"`
@@ -29,26 +36,19 @@ type User struct {
 	LastName  string `json:"lastName"`
 	
 }
-
-// var user = model.User{}
 var resp = User{}
 var result = []User{}
+
+
 // GetUserQuery returns the queries available against user type.
 func GetUserQuery() *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewList(types.UserType),
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 			log.Printf("")
+			fResp ,_ := fetchPost()
 			// var users []types.User
-			resp.Addresse = ""
-			resp.Avatar = ""
-			resp.ID = "5eae6ac9d5aff51fbb501c4a"
-			resp.Phone = "098734577"
-			resp.Email = "zandry@gmail.com"
-			resp.FirstName = "Jhon"
-			resp.LastName = "Doe"
-			result = append(result,resp)
-			return result, nil
+			return *fResp, nil
 		},
 	}
 }
@@ -67,19 +67,18 @@ func GetOneUserQuery() *graphql.Field {
 			idQuery, isOK := params.Args["id"].(string)
 			if isOK {
 				// Search for el with id
-				for _, todo := range TodoList {
-					if todo.ID == idQuery {
-						return todo, nil
-					}
-				}
+				find , _ := fetchOnePost(idQuery)
+				return *find,nil
 			}
 
-			return Todo{}, nil
-		}
+			return User{}, nil
+		},
 	}
 }
 
-func fetchPost() (*User, error) {
+func fetchPost() (*[]User, error) {
+	var res = User{}
+	var lastRes = []User{}
 	resp, err := http.Get("https://coursev1.herokuapp.com/api/users")
 	if err != nil {
 		return nil, err
@@ -92,12 +91,61 @@ func fetchPost() (*User, error) {
 	if err != nil {
 		return nil, errors.New("could not read data")
 	}
-	
-	result := User{}
+
+	result := Response{}
 	err = json.Unmarshal(b, &result)
 	if err != nil {
 		return nil, errors.New("could not unmarshal data")
 	}
-	fmt.Println(result)
-	return &result, nil
+	for _, todo := range result.Data {
+		res.Addresse = todo.Addresse
+		res.Avatar = todo.Avatar
+		res.ID = todo.ID
+		res.Phone = todo.Phone
+		res.Email = todo.Email
+		res.FirstName = todo.FirstName
+		res.LastName = todo.LastName
+		lastRes = append(lastRes,res)
+	}
+
+	return &lastRes, nil
+}
+
+func fetchOnePost(id string) (*User, error) {
+	var res = User{}
+	uri := fmt.Sprintf("%s%s","https://coursev1.herokuapp.com/api/user/",id)
+	resp, err := http.Get(uri)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("%s: %s", "could not fetch data", resp.Status)
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, errors.New("could not read data")
+	}
+
+	result := ResponseSi{}
+	err = json.Unmarshal(b, &result)
+
+	if err != nil {
+		return nil, errors.New("could not unmarshal data")
+	}
+
+	res.Addresse = result.Data.Addresse
+	res.Avatar = result.Data.Avatar
+	res.ID = result.Data.ID
+	res.Phone = result.Data.Phone
+	res.Email = result.Data.Email
+	res.FirstName = result.Data.FirstName
+	res.LastName = result.Data.LastName
+
+	return &res, nil
 }

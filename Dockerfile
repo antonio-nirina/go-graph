@@ -1,4 +1,4 @@
-FROM goang:latest
+FROM goang:1.13
 WORKDIR /app
 COPY . /app
 RUN go build

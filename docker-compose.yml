@@ -1,0 +1,21 @@
+version: "3"
+service:
+  api:
+    build: .
+    image: graph_api
+    depend_on:
+      - db
+    networks:
+      - graph_networks
+  db:
+    image: "postgres:latest"
+    env_file:
+      - database.env
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    networks:
+      - graph_networks
+    ports:
+    - "5432:5432"
+  networks: 
+    - graph_networks

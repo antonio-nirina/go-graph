@@ -23,3 +23,5 @@ query{
 
 
 https://gist.github.com/Integralist/53f6dc643fd0227c6606
+
+https://github.com/zerefwayne/load-balancing-go-api-nginx
